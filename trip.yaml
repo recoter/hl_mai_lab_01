@@ -1,0 +1,165 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "Trip API"
+  description: Пример API для первого домашнего задания по курсу Архитектура программных систем
+servers:
+  - url: http://localhost:8082
+    description: Trip service
+paths:
+  /trip:   
+    post:
+      summary: Создание поездки
+      parameters:
+      - name: host_id
+        description: Идентификатор создателя поездки
+        in: query
+        required: true
+        schema:
+          type: integer
+      - name: route_id
+        description: Идентификатор маршрута поездки
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: name
+        description: Название поездки
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: type
+        description: Тип поездки
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: trip_date
+        description: Дата поездки
+        in: query
+        required: true
+        schema:
+          type: string
+      
+      responses:
+        '200':
+          description: Идентификатор, добавленной поездки
+          content:
+            application/json:
+              schema:
+                type: integer
+        404:
+          description: Ошибка добавления поездки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Неожиданная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'                
+  /get_trip:
+      get: 
+        summary: Получение информации о поездках пользователя
+        parameters:
+          - name: id
+            description: ID поездки
+            in: query
+            required: true            
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Список данных о поездках
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/trips'
+          404:
+            description: Пользователь не найден
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Неожиданная ошибка
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /get_all_trips:
+      get: 
+        summary: Получение информации о поездках
+        responses:
+          '200':
+            description: Список данных о поездках
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/trips'
+          404:
+            description: Пользователь не найден
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Неожиданная ошибка
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    trips: 
+      description: Список данных о поездках.
+      type: array 
+      items:
+        $ref: '#/components/schemas/trip'
+
+    trip_id:
+      description: Уникальный идентификатор поездки
+      type: integer
+
+    trip:
+      description: Информация о поездке.
+      type: object
+      required:
+        - id
+        - host_id
+        - route_id
+        - name
+        - type
+        - trip_date
+      properties:
+        id:
+          $ref: '#/components/schemas/trip_id'
+        host_id:
+          type: integer
+        route_id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        trip_date:
+          type: string
+        
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: Сообщение о ошибке
+          type: string
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []
